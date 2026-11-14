@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global safety net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_-]+$');
+    }
+
+    function isAdmin() {
+      return isSignedIn() 
+        && request.auth.token.email == 'theapoapostolov@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // 2. Users Profiles Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId);
+    }
+
+    // 3. Campaigns Collection
+    match /campaigns/{campaignId} {
+      allow read, write: if true;
+    }
+
+    // 4. Player Availabilities Subcollection
+    match /campaigns/{campaignId}/availabilities/{userId} {
+      allow read, write: if true;
+    }
+
+    // 5. Game Sessions Subcollection
+    match /campaigns/{campaignId}/sessions/{sessionId} {
+      allow read, write: if true;
+    }
+  }
+}

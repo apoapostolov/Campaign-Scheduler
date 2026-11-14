@@ -1,0 +1,6 @@
+{
+  "name": "Campaign Session Scheduler",
+  "description": "A polished scheduling tracker for D&D players and DMs to coordinate campaign availability, proposed game times, session counts, and automated Google Calendar and Gmail synchronizations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

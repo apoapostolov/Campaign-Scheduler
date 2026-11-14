@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile containing roles, preferences, and Google Calendar syncing settings.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "The unique Firebase Auth User ID" },
+        "email": { "type": "string", "format": "email", "description": "The user email" },
+        "displayName": { "type": "string", "description": "The displayed name of the player or DM" },
+        "gmailCalendarSync": { "type": "boolean", "description": "True if player turns on Google Calendar sync using their Gmail account" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "The creation timestamp" }
+      },
+      "required": ["uid", "email", "displayName", "gmailCalendarSync", "createdAt"]
+    },
+    "Campaign": {
+      "title": "Campaign Settings",
+      "description": "Campaign metadata including session tracking, DM info, and roster configuration.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique campaign ID" },
+        "name": { "type": "string", "description": "Campaign name (e.g., Vaults, The Keep, Vampire 5E)" },
+        "sessionCounter": { "type": "integer", "description": "Total number of sessions played so far" },
+        "currentWeekRange": { "type": "string", "description": "The active scheduling week range (e.g., '1-7 June')" },
+        "dmUserId": { "type": "string", "description": "The Firebase Auth user ID of the DM" },
+        "dmEmail": { "type": "string", "format": "email", "description": "The DM email address" },
+        "dmName": { "type": "string", "description": "The DM display name" },
+        "playerUids": { "type": "array", "description": "Array of user IDs participating in the campaign" }
+      },
+      "required": ["id", "name", "sessionCounter", "currentWeekRange", "dmUserId", "dmEmail", "dmName", "playerUids"]
+    },
+    "UserAvailability": {
+      "title": "Player Availability",
+      "description": "A player or DM's availability selections and notes for a specific campaign and week.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The Firebase Auth user ID" },
+        "playerName": { "type": "string", "description": "The display name of the player" },
+        "notes": { "type": "string", "description": "Personal vacation descriptions or schedules" },
+        "selections": { "type": "object", "description": "Map of Bulgarian weekday names to status (PLAY, SKIP, MAYBE, LATE 1 HR, NO-VOTE)" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp" }
+      },
+      "required": ["userId", "playerName", "selections", "updatedAt"]
+    },
+    "GameSession": {
+      "title": "D&D Game Session",
+      "description": "An upcoming, proposed, or completed game session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique session ID" },
+        "status": { "type": "string", "enum": ["proposed", "scheduled", "cancelled"], "description": "Resolution status" },
+        "scheduledDateTime": { "type": "string", "format": "date-time", "description": "Selected start date and time" },
+        "proposedDays": { "type": "array", "description": "Days proposed for the gaming session" },
+        "calendarEventId": { "type": "string", "description": "The associated Google Calendar event ID in the DM's calendar" },
+        "sentOneDaySummary": { "type": "boolean", "description": "Whether the summary was emailed to the DM 24 hours prior" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Session creation time" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Session modification time" }
+      },
+      "required": ["id", "status", "scheduledDateTime", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "User",
+      "description": "Matches a user profile schema"
+    },
+    "campaigns/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Matches a campaign metadata schema"
+    },
+    "campaigns/{campaignId}/availabilities/{userId}": {
+      "schema": "UserAvailability",
+      "description": "Matches user availability inside a campaign context"
+    },
+    "campaigns/{campaignId}/sessions/{sessionId}": {
+      "schema": "GameSession",
+      "description": "Matches a game session subcollection"
+    }
+  }
+}
